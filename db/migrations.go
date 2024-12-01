@@ -22,6 +22,7 @@ func RunMigrations(db *sql.DB) error {
 		ManageServices BOOLEAN NOT NULL DEFAULT 0,
 		ManageTags BOOLEAN NOT NULL DEFAULT 0,
 		ManageForwarding BOOLEAN NOT NULL DEFAULT 0,
+		ViewLogs BOOLEAN NOT NULL DEFAULT 0,
 		FOREIGN KEY (UserID) REFERENCES User(ID)
 	);
 	`

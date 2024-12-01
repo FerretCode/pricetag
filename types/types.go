@@ -15,6 +15,7 @@ type Permission struct {
 	ManageServices   bool
 	ManageTags       bool
 	ManageForwarding bool
+	ViewLogs         bool
 }
 
 type Service struct {
@@ -25,5 +26,5 @@ type Tag struct {
 
 type Error struct {
 	Status int
-	Error string
+	Error  string
 }
