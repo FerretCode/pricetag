@@ -9,5 +9,19 @@
             href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
         />
     </head>
-    <body></body>
+    <body>
+        {{ template "navbar" . }}
+
+        <div class="mt-5 columns is-mobile is-centered">
+            <div class="column is-half">
+                <div class="card">
+                    <div class="card-content has-text-centered">
+                        <h1 class="title">An error occurred.</h1>
+                        <h2 class="subtitle">Error Status: {{ .Status }}</h2>
+                        <h2 class="subtitle">Error Message: {{ .Error }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>

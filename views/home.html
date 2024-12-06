@@ -10,7 +10,61 @@
         />
     </head>
     <body>
-        <p>hello friends</p>
         {{ template "navbar" . }}
+
+        <div
+            class="is-flex is-justify-content-center is-align-items-center"
+            style="height: 100vh"
+        >
+            <div class="grid m-5">
+                <div class="cell">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            Tracked Services
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cell">
+                    <div class="card">
+                        <div class="card-content has-text-centered">Tags</div>
+                    </div>
+                </div>
+
+                <div class="cell">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            Forwarding
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cell">
+                    <div class="card">
+                        <div class="card-content has-text-centered">Logs</div>
+                    </div>
+                </div>
+
+                <div class="cell">
+                    <div class="card">
+                        <div class="card-content has-text-centered">Users</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
+
+    <style>
+        .card {
+            box-shadow: none;
+            border: 1px solid #dbdbdbdb;
+        }
+
+        html,
+        body {
+            overflow: hidden;
+            margin: 0;
+            height: 100%;
+        }
+    </style>
 </html>

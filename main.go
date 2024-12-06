@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -10,8 +9,6 @@ import (
 
 	"github.com/charmbracelet/log"
 	database "github.com/ferretcode/pricetag/db"
-	"github.com/ferretcode/pricetag/errors"
-	"github.com/ferretcode/pricetag/routes/views"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
@@ -68,25 +65,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	for _, template := range templates.Templates() {
-		fmt.Println(template.Name())
-	}
-
 	r := chi.NewRouter()
 
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Logger)
 
-	r.Route("/dashboard", func(r chi.Router) {
-		// TODO: write admin middleware
-		r.Get("/home", func(w http.ResponseWriter, r *http.Request) {
-			err := views.Home(w, r, templates)
-			if err != nil {
-				errors.HandleError(w, http.StatusInternalServerError, err.Error(), templates)
-			}
-		})
-	})
+	registerHandlers(r)
 
-	http.ListenAndServe(":"+os.Getenv("PORT"), r)
+	// TODO: change in production
+	// http.ListenAndServe(":"+os.Getenv("PORT"), r)
+	http.ListenAndServe("localhost:"+os.Getenv("PORT"), r)
 }
