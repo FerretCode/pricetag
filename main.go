@@ -71,7 +71,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Logger)
 
-	registerHandlers(r)
+	registerHandlers(r, db)
 
 	// TODO: change in production
 	// http.ListenAndServe(":"+os.Getenv("PORT"), r)
