@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"net/http"
 
@@ -83,9 +82,6 @@ func CheckAdmin(db *sqlx.DB, session *session.SessionManager, templates *templat
 				errors.HandleError(w, r.URL.Path, 500, err.Error(), templates)
 				return
 			}
-
-			fmt.Println(user)
-			fmt.Println(permission)
 
 			ctx := context.WithValue(r.Context(), "user", user)
 			ctx = context.WithValue(ctx, "permission", permission)
