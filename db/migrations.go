@@ -1,10 +1,10 @@
 package db
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 )
 
-func RunMigrations(db *sql.DB) error {
+func RunMigrations(db *sqlx.DB) error {
 	createUserTableQuery := `
 	CREATE TABLE User (
 		ID INTEGER PRIMARY KEY AUTOINCREMENT,

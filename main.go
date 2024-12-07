@@ -1,22 +1,25 @@
 package main
 
 import (
-	"database/sql"
 	"html/template"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/log"
 	database "github.com/ferretcode/pricetag/db"
+	"github.com/ferretcode/pricetag/session"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 
 	_ "modernc.org/sqlite"
 )
 
 var templates *template.Template
+var sessionManager = session.NewSessionManager(30 * time.Minute)
 
 func parseTemplates() error {
 	var err error
@@ -25,6 +28,8 @@ func parseTemplates() error {
 		"./views/fragments/navbar.html",
 		"./views/home.html",
 		"./views/error.html",
+		"./views/user/create.html",
+		"./views/user/login.html",
 	}
 
 	templates, err = template.ParseFiles(files...)
@@ -43,7 +48,7 @@ func main() {
 		}
 	}
 
-	db, err := sql.Open("sqlite", "./data.db")
+	db, err := sqlx.Open("sqlite", "./data.db")
 	if err != nil {
 		log.Error("error opening connection to db", "err", err)
 		os.Exit(1)
