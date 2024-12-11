@@ -12,14 +12,14 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func CheckAdmin(db *sqlx.DB, session *session.SessionManager, templates *template.Template) func(next http.Handler) http.Handler {
+func CheckUser(db *sqlx.DB, session *session.SessionManager, templates *template.Template) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("session_id")
 
 			if err != nil {
 				if err == http.ErrNoCookie {
-					errors.HandleError(w, r.URL.Path, 403, err.Error(), templates)
+					errors.HandleError(w, r.URL.Path, 403, "please log in", templates)
 					return
 				}
 			}

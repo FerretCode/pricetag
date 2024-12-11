@@ -13,7 +13,7 @@ import (
 
 func registerHandlers(r chi.Router, db *sqlx.DB) {
 	r.Route("/dashboard", func(r chi.Router) {
-		r.Use(middleware.CheckAdmin(db, sessionManager, templates))
+		r.Use(middleware.CheckUser(db, sessionManager, templates))
 
 		r.Get("/home", func(w http.ResponseWriter, r *http.Request) {
 			err := dashboard.Home(w, r, templates)

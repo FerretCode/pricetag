@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type User struct {
 	ID           int    `db:"ID"`
 	Username     string `db:"Username"`
@@ -22,6 +24,12 @@ type Service struct {
 }
 
 type Tag struct {
+}
+
+type Log struct {
+	Message   string    `json:"message"`
+	Level     string    `json:"level"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 type Error struct {

@@ -24,3 +24,7 @@ A self hosted, simple, and robust log filtering platform with support for log fo
         -   manage tags
         -   manage tracked services
         -   manage log forwarding
+
+# acknowledgements
+
+-   much of the code for the Railway provider is inspired by https://github.com/ferretcode/locomotive
