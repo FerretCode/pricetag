@@ -5,5 +5,5 @@ import (
 )
 
 type Sink struct {
-	NewLog chan types.Log
+	NewLog chan []types.Log
 }

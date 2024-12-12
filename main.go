@@ -79,6 +79,7 @@ func main() {
 	registerHandlers(r, db)
 
 	// TODO: change in production
+	// TODO: implement TLS
 	// http.ListenAndServe(":"+os.Getenv("PORT"), r)
 	http.ListenAndServe("localhost:"+os.Getenv("PORT"), r)
 }

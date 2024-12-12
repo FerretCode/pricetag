@@ -10,7 +10,7 @@ import (
 // RAILWAY_ENVIRONMENT_ID=
 
 func CreateSink() sink.Sink {
-	newLogChan := make(chan types.Log)
+	newLogChan := make(chan []types.Log)
 
 	return sink.Sink{
 		NewLog: newLogChan,
