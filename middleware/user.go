@@ -44,14 +44,9 @@ func CheckUser(db *sqlx.DB, session *session.SessionManager, templates *template
 				return
 			}
 
-			res, err := db.Queryx(sql, args...)
+			err = db.Get(&user, sql, args...)
 			if err != nil {
-				errors.HandleError(w, r.URL.Path, 500, err.Error(), templates)
-				return
-			}
-
-			if !res.Next() {
-				errors.HandleError(w, r.URL.Path, 403, "you cannot access this resource", templates)
+				errors.HandleError(w, r.URL.Path, 403, "you may not access this resource", templates)
 				return
 			}
 
@@ -66,20 +61,9 @@ func CheckUser(db *sqlx.DB, session *session.SessionManager, templates *template
 				return
 			}
 
-			res, err = db.Queryx(sql, args...)
+			err = db.Get(&permission, sql, args...)
 			if err != nil {
-				errors.HandleError(w, r.URL.Path, 500, err.Error(), templates)
-				return
-			}
-
-			if !res.Next() {
-				errors.HandleError(w, r.URL.Path, 403, "you cannot access this resource", templates)
-				return
-			}
-
-			err = res.StructScan(&permission)
-			if err != nil {
-				errors.HandleError(w, r.URL.Path, 500, err.Error(), templates)
+				errors.HandleError(w, r.URL.Path, 403, "you may not access this resource", templates)
 				return
 			}
 

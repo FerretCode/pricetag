@@ -1,6 +1,7 @@
 package user
 
 import (
+	"database/sql"
 	"errors"
 	"html/template"
 	"net/http"
@@ -57,24 +58,17 @@ func Login(w http.ResponseWriter, r *http.Request, db *sqlx.DB, session *session
 		From("User").
 		Where(squirrel.Eq{"Username": loginUserRequest.Username})
 
-	sql, args, err := loginUsersQuery.ToSql()
+	query, args, err := loginUsersQuery.ToSql()
 	if err != nil {
 		return 500, err
-	}
-
-	res, err := db.Queryx(sql, args...)
-	if err != nil {
-		return 500, err
-	}
-
-	if !res.Next() {
-		return 404, errors.New("that user was not found")
 	}
 
 	user := types.User{}
-
-	err = res.StructScan(&user)
+	err = db.Get(&user, query, args...)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return 404, errors.New("user not found")
+		}
 		return 500, err
 	}
 

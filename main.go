@@ -55,6 +55,9 @@ func main() {
 	}
 	defer db.Close()
 
+	db.SetMaxOpenConns(1)
+	db.SetMaxIdleConns(1)
+
 	err = database.RunMigrations(db)
 	if err != nil {
 		log.Error("error running database migrations", "err", err)

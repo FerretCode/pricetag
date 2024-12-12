@@ -23,7 +23,7 @@ func RunMigrations(db *sqlx.DB) error {
 		ManageTags BOOLEAN NOT NULL DEFAULT 0,
 		ManageForwarding BOOLEAN NOT NULL DEFAULT 0,
 		ViewLogs BOOLEAN NOT NULL DEFAULT 0,
-		FOREIGN KEY (UserID) REFERENCES User(ID)
+		FOREIGN KEY (UserID) REFERENCES User(ID) ON DELETE CASCADE
 	);
 	`
 

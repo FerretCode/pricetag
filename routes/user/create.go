@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/charmbracelet/log"
 	"github.com/ferretcode/pricetag/session"
 	"github.com/ferretcode/pricetag/types"
 	"github.com/jmoiron/sqlx"
@@ -29,6 +30,11 @@ func RenderCreateUserPage(w http.ResponseWriter, r *http.Request, templates *tem
 }
 
 func Create(w http.ResponseWriter, r *http.Request, db *sqlx.DB, session *session.SessionManager) (status int, err error) {
+	err = deleteExistingSession(w, r, session)
+	if err != nil {
+		return 500, err
+	}
+
 	err = r.ParseForm()
 	if err != nil {
 		return 500, err
@@ -73,6 +79,7 @@ func Create(w http.ResponseWriter, r *http.Request, db *sqlx.DB, session *sessio
 	}
 
 	sessionID := session.CreateSession(userID)
+
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_id",
 		Value:   sessionID,
@@ -81,9 +88,38 @@ func Create(w http.ResponseWriter, r *http.Request, db *sqlx.DB, session *sessio
 		Expires: time.Now().Add(24 * time.Hour),
 	})
 
+	log.Info("successfully created user", "id", userID, "username", createUserRequest.Username)
+
 	http.Redirect(w, r, "/dashboard/home", http.StatusFound)
 
 	return 200, nil
+}
+
+func deleteExistingSession(w http.ResponseWriter, r *http.Request, session *session.SessionManager) error {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			return nil
+		}
+		return err
+	}
+
+	_, err = session.GetSession(cookie.Value)
+	if err == nil {
+		session.DeleteSession(cookie.Value)
+	}
+
+	deleteCookie := &http.Cookie{
+		Name:    "session_id",
+		Value:   "",
+		Path:    "/",
+		Domain:  os.Getenv("COOKIE_DOMAIN"),
+		Expires: time.Unix(0, 0),
+	}
+
+	http.SetCookie(w, deleteCookie)
+
+	return nil
 }
 
 func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx.DB) (userID int, err error) {
@@ -104,6 +140,7 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 	if err != nil {
 		return 0, err
 	}
+	defer tx.Rollback()
 
 	rows, err := tx.Queryx(sql, args...)
 	if err != nil {
