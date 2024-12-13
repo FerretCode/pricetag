@@ -35,10 +35,14 @@ func Create(w http.ResponseWriter, r *http.Request, db *sqlx.DB, session *sessio
 		return 500, err
 	}
 
+	log.Info("existing session deleted")
+
 	err = r.ParseForm()
 	if err != nil {
 		return 500, err
 	}
+
+	log.Info("form parsed successfully")
 
 	currentUsersQuery := squirrel.Select("*").From("User")
 
@@ -52,33 +56,49 @@ func Create(w http.ResponseWriter, r *http.Request, db *sqlx.DB, session *sessio
 		return 500, err
 	}
 
+	exists := res.Next()
+
+	log.Info("are there existing users", "exists", exists)
+
 	admin := false
 
-	if !res.Next() {
+	if !exists {
 		admin = true
 	}
+
+	log.Info("admin is set to", "admin", admin)
 
 	createUserRequest := createUserRequest{
 		Username: r.PostFormValue("username"),
 		Password: r.PostFormValue("password"),
 	}
 
+	log.Info("create request populated", "username", createUserRequest.Username, "password", createUserRequest.Password)
+
 	status, err = validateUsernameAndPassword(createUserRequest.Username, createUserRequest.Password)
 	if err != nil {
 		return status, err
 	}
+
+	log.Info("the user was successfully validated")
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(createUserRequest.Password), 14)
 	if err != nil {
 		return 500, err
 	}
 
+	log.Info("password was successfully hashed", "hash", string(hash))
+
 	userID, err := createUserDBRecord(createUserRequest, string(hash), admin, db)
 	if err != nil {
 		return 500, err
 	}
 
+	log.Info("user record was created", "user_id", userID)
+
 	sessionID := session.CreateSession(userID)
+
+	log.Info("session was created", "session_id", sessionID)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_id",
@@ -134,6 +154,8 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 		return 0, err
 	}
 
+	log.Info("create user query created", "query", sql, "args", args)
+
 	user := types.User{}
 
 	tx, err := db.Beginx()
@@ -142,11 +164,16 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 	}
 	defer tx.Rollback()
 
+	log.Info("transaction has started")
+
 	rows, err := tx.Queryx(sql, args...)
 	if err != nil {
+		log.Error("failed to begin transaction", "err", err)
 		return 0, err
 	}
 	defer rows.Close()
+
+	log.Info("query was successful")
 
 	if rows.Next() {
 		err = rows.StructScan(&user)
@@ -156,6 +183,8 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 	} else {
 		return 0, errors.New("error getting returned user")
 	}
+
+	log.Info("user record", "user", user)
 
 	createNewPermissionQuery := squirrel.
 		Insert("Permission").
@@ -168,6 +197,8 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 		return 0, err
 	}
 
+	log.Info("create permission query", "query", sql, "args", args)
+
 	permission := types.Permission{}
 
 	rows, err = tx.Queryx(sql, args...)
@@ -175,6 +206,8 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 		return 0, err
 	}
 	defer rows.Close()
+
+	log.Info("permission request was successfully executed")
 
 	if rows.Next() {
 		err = rows.StructScan(&permission)
@@ -184,6 +217,8 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 	} else {
 		return 0, errors.New("error getting returned permission")
 	}
+
+	log.Info("permission was created", "permission", permission)
 
 	updateUserPermissionQuery := squirrel.
 		Update("User").
@@ -200,10 +235,14 @@ func createUserDBRecord(cur createUserRequest, hash string, admin bool, db *sqlx
 		return 0, err
 	}
 
+	log.Info("user was updated", "permission_id", permission.ID)
+
 	err = tx.Commit()
 	if err != nil {
 		return 0, err
 	}
+
+	log.Info("tx was committed")
 
 	return user.ID, nil
 }

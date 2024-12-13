@@ -48,7 +48,7 @@ func main() {
 		}
 	}
 
-	db, err := sqlx.Open("sqlite", "./data.db")
+	db, err := sqlx.Open("sqlite", "file:data.db?&_journal_mode=WAL")
 	if err != nil {
 		log.Error("error opening connection to db", "err", err)
 		os.Exit(1)
