@@ -1,2 +1,10 @@
+bin/
+
+*.rest
+*.http
+*.db
+*.db-journal
+
+.envrc
 .env
-data.db
+

@@ -1,0 +1,56 @@
+{{define "title"}}Manage Users{{end}}
+
+{{define "main"}}
+<main>
+    <h1>Manage Users</h1>
+
+    <form method="GET" id="select-user-form">
+        <label for="select-user">
+            Choose User:
+        </label>
+        <select name="user" id="select-user">
+        {{range .Data.Usernames}}
+            <option
+                value="{{.}}"
+                {{if eq . $.Data.Selected}}
+                selected
+                {{end}}
+            >{{.}}</option>
+        {{end}}
+        </select>
+        <noscript>
+            <button>Select</button>
+        </noscript>
+    </form>
+
+    <h2>Permissions</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <input type="hidden" name="username" value="{{.Data.Selected}}">
+        {{if includes $.Data.UserPerms "admin"}}
+        <input type="hidden" name="admin" value="on">
+        {{end}}
+        {{range .Data.Permissions}}
+        <div>
+            <label for="perm-{{.}}">{{.}}</label>
+            <input
+                type="checkbox"
+                name="{{.}}"
+                id="perm-{{.}}"
+                {{if includes $.Data.UserPerms .}}
+                checked
+                {{if eq . "admin"}}
+                disabled
+                {{end}}
+                {{end}}
+            >
+        </div>
+        {{end}}
+        <button>Update Permissions</button>
+    </form>
+</main>
+{{end}}
+
+{{define "scripts"}}
+<script src="/static/scripts/users.js"></script>
+{{end}}

@@ -1,0 +1,30 @@
+{{define "title"}}Dashboard{{end}}
+
+{{define "main"}}
+<main>
+    <h1>Dashboard</h1>
+    <table>
+        <tbody>
+            <tr>
+                <th>Username</th>
+                <td>{{.Data.Username}}</td>
+            </tr>
+            <tr>
+                <th>Permissions</th>
+                <td>{{.Data.Permissions}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <nav>
+        <ul>
+            <li><a href="/services">Tracked services</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/forwarding">Forwarding</a></li>
+            <li><a href="/logs">Logs</a></li>
+            <li><a href="/users">Users</a></li>
+        </ul>
+    </nav>
+</main>
+{{end}}
+
+{{define "scripts"}}{{end}}
