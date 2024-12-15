@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -106,6 +107,7 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 	})
 }
 
+// Implicitly requires authentication
 func (app *application) requirePermission(code string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +119,7 @@ func (app *application) requirePermission(code string) func(http.Handler) http.H
 				return
 			}
 
-			permissions, err := app.models.Permission.GetAllForUser(suid)
+			permissions, err := app.models.Permission.GetForUser(suid)
 			if err != nil {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				app.logger.Error("middleware requirePermission", slog.Any("err", err))
@@ -126,7 +128,7 @@ func (app *application) requirePermission(code string) func(http.Handler) http.H
 			}
 
 			if !permissions.Include(code) {
-				app.renderError(w, r, http.StatusForbidden, nil)
+				app.renderError(w, r, http.StatusForbidden, fmt.Sprintf("permission required: %s", code))
 
 				return
 			}

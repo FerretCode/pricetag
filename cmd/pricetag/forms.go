@@ -43,7 +43,7 @@ func (app *application) popFormErrors(r *http.Request) FormErrors {
 	return FormErrors{}
 }
 
-// Decode form value to struct and check for any form errors
+// Decode form values to struct and check for any form errors
 func (app *application) parseForm(r *http.Request, dst any) error {
 	err := r.ParseForm()
 	if err != nil {

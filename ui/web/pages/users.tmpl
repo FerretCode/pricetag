@@ -8,11 +8,11 @@
         <label for="select-user">
             Choose User:
         </label>
-        <select name="user" id="select-user">
+        <select name="username" id="select-user">
         {{range .Data.Usernames}}
             <option
                 value="{{.}}"
-                {{if eq . $.Data.Selected}}
+                {{if eq . $.Data.Username}}
                 selected
                 {{end}}
             >{{.}}</option>
@@ -26,7 +26,7 @@
     <h2>Permissions</h2>
     <form method="POST">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-        <input type="hidden" name="username" value="{{.Data.Selected}}">
+        <input type="hidden" name="username" value="{{.Data.Username}}">
         {{if includes $.Data.UserPerms "admin"}}
         <input type="hidden" name="admin" value="on">
         {{end}}
@@ -48,6 +48,15 @@
         {{end}}
         <button>Update Permissions</button>
     </form>
+    
+    {{if .Data.ShowDelete}}
+    <h2>Danger Zone</h2>
+    <form method="POST" action="/users/delete">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <input type="hidden" name="username" value="{{.Data.Username}}">
+        <button>Delete User</button>
+    </form>
+    {{end}}
 </main>
 {{end}}
 

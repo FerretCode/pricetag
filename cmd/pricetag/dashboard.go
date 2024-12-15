@@ -16,7 +16,7 @@ func (app *application) handleDashboardGet(w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	perms, err := app.models.Permission.GetAllForUser(user.ID)
+	perms, err := app.models.Permission.GetForUser(user.ID)
 	if err != nil {
 		return err
 	}

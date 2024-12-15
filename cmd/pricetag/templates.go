@@ -57,8 +57,9 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, statusCod
 	return writeTemplate(t, td, w, statusCode)
 }
 
-func (app *application) renderError(w http.ResponseWriter, r *http.Request, statusCode int, err error) error {
-	http.Error(w, http.StatusText(statusCode), statusCode)
+// Render error template with statusCode. Default userMessage with http.StatusText
+func (app *application) renderError(w http.ResponseWriter, r *http.Request, statusCode int, userMessage string) error {
+	http.Error(w, userMessage, statusCode)
 
 	return nil
 }

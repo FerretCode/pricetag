@@ -53,7 +53,7 @@ func (m PermissionModel) AllCodes() (Permissions, error) {
 	return permissions, nil
 }
 
-func (m PermissionModel) GetAllForUser(userID int) (Permissions, error) {
+func (m PermissionModel) GetForUser(userID int) (Permissions, error) {
 	query := `
 		SELECT permissions.code
 		FROM permissions

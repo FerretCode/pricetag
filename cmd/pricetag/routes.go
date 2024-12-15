@@ -68,6 +68,7 @@ func (app *application) routes() http.Handler {
 
 			r.Get("/", app.handle(app.handleUsersGet))
 			r.Post("/", app.handle(app.handleUsersPost))
+			r.Post("/delete", app.handle(app.handleUsersDeletePost))
 		})
 	})
 

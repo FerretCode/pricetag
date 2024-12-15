@@ -83,7 +83,7 @@ func (m *UserModel) Insert(user *User) error {
 }
 
 func (m UserModel) Usernames() ([]string, error) {
-	query := "SELECT username FROM users;"
+	query := "SELECT username FROM users ORDER BY id;"
 
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
@@ -143,7 +143,7 @@ func (m *UserModel) GetWithID(id int) (*User, error) {
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return nil, ErrInvalidCredentials
+			return nil, ErrNoRecord
 		default:
 			return nil, err
 		}
@@ -169,7 +169,7 @@ func (m *UserModel) GetWithUsername(username string) (*User, error) {
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return nil, ErrInvalidCredentials
+			return nil, ErrNoRecord
 		default:
 			return nil, err
 		}
@@ -181,7 +181,12 @@ func (m *UserModel) GetWithUsername(username string) (*User, error) {
 func (m *UserModel) GetForCredentials(username, password string) (*User, error) {
 	u, err := m.GetWithUsername(username)
 	if err != nil {
-		return nil, err
+		switch {
+		case errors.Is(err, ErrNoRecord):
+			return nil, ErrInvalidCredentials
+		default:
+			return nil, err
+		}
 	}
 
 	match, err := argon2id.ComparePasswordAndHash(password, string(u.PasswordHash))
@@ -260,6 +265,27 @@ func (m UserModel) Update(user *User) error {
 		switch sqliteErrCode(err) {
 		case sqlite3.ErrConstraintUnique:
 			return ErrDuplicateUsername
+		default:
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m UserModel) Delete(id int) error {
+	query := `
+		DELETE FROM users
+		WHERE id = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
+	defer cancel()
+
+	_, err := m.db.ExecContext(ctx, query, id)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrNoRecord
 		default:
 			return err
 		}
