@@ -11,6 +11,17 @@ help:
 confirm:
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
 
+## css: build daemon for TailwindCSS
+.PHONY: css
+css:
+	tailwindcss -i ./ui/input.css -o ./ui/static/main.css --watch
+
+## css-minify: build CSS for production
+.PHONY: css-minify
+css-minify:
+	tailwindcss -i ./ui/input.css -o ./ui/static/main.css --minify
+
+
 ## audit: tidy dependencies and format, vet and test all code
 .PHONY: audit
 audit:
@@ -25,14 +36,19 @@ audit:
 	@echo "Running tests..."
 	go test -race -vet=off ./...
 	
-## build: build the cmd/pricetag application
+## build: build the cmd/pricetag application for production
 .PHONY: build
-build:
+build: css-minify
 	@echo "Building cmd/pricetag..."
-	go build -ldflags="-s" -o=./bin/web ./cmd/pricetag
+	go build -ldflags="-s" -o=./bin/pricetag ./cmd/pricetag
 
 ## run: run the cmd/pricetag application
 .PHONY: run
 run:
-	go run ./cmd/pricetag -port=5000 -dev \
+	go run ./cmd/pricetag -port=${PORT} -dev \
 		-db-dsn=${DATABASE_URL}
+
+## dev: run cmd/pricetag and CSS daemon
+.PHONY: dev
+dev:
+	${MAKE} -j2 css run
