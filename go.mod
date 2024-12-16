@@ -14,6 +14,7 @@ require (
 	github.com/justinas/nosurf v1.1.1
 	github.com/lmittmann/tint v1.0.5
 	github.com/mattn/go-sqlite3 v1.14.24
+	golang.org/x/text v0.21.0
 )
 
 require (
@@ -28,5 +29,4 @@ require (
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
 )
