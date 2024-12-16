@@ -8,3 +8,5 @@ bin/
 .envrc
 .env
 
+
+ui/static/main.css
