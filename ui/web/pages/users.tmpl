@@ -51,7 +51,7 @@
     
     {{if .Data.ShowDelete}}
     <h2>Danger Zone</h2>
-    <form method="POST" action="/users/delete">
+    <form method="POST" action="/users/delete" id="delete-user-form">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <input type="hidden" name="username" value="{{.Data.Username}}">
         <button>Delete User</button>
