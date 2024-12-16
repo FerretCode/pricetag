@@ -64,7 +64,7 @@ func (app *application) handleAuthLoginGet(w http.ResponseWriter, r *http.Reques
 
 func (app *application) handleAuthLoginPost(w http.ResponseWriter, r *http.Request) error {
 	if app.isAuthenticated(r) {
-		return app.renderError(w, r, http.StatusBadRequest, "already authenticated")
+		return app.renderError(w, r, http.StatusBadRequest, MessageAlreadyAuthenticated)
 	}
 
 	var form struct {
@@ -81,7 +81,7 @@ func (app *application) handleAuthLoginPost(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		switch {
 		case errors.Is(err, models.ErrInvalidCredentials):
-			return app.renderError(w, r, http.StatusUnauthorized, "invalid credentials")
+			return app.renderError(w, r, http.StatusUnauthorized, MessageInvalidCredentials)
 		default:
 			return err
 		}
@@ -111,12 +111,13 @@ func (app *application) handleAuthLogoutPost(w http.ResponseWriter, r *http.Requ
 
 func (app *application) handleAuthSignupPost(w http.ResponseWriter, r *http.Request) error {
 	if app.isAuthenticated(r) {
-		return app.renderError(w, r, http.StatusBadRequest, "already authenticated")
+		return app.renderError(w, r, http.StatusBadRequest, MessageAlreadyAuthenticated)
 	}
 
 	var form struct {
 		Username string `form:"username" validate:"required,max=254"`
 		Password string `form:"password" validate:"required,min=8,max=72"`
+		Confirm  string `form:"confirm" validate:"required,eqfield=Password"`
 	}
 
 	err := app.parseForm(r, &form)
@@ -132,7 +133,7 @@ func (app *application) handleAuthSignupPost(w http.ResponseWriter, r *http.Requ
 	user, err := app.models.User.New(form.Username, form.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateUsername) {
-			return app.renderError(w, r, http.StatusUnauthorized, "invalid credentials")
+			return app.renderError(w, r, http.StatusUnauthorized, "")
 		}
 
 		return err

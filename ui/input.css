@@ -7,15 +7,11 @@ h1 {
 }
 
 h2 {
-    @apply text-2xl mb-4;
+    @apply text-2xl;
 }
 
 h3 {
-    @apply text-xl mb-4;
-}
-
-p {
-    @apply mb-4;
+    @apply text-xl;
 }
 
 /* default border color */
@@ -29,6 +25,11 @@ p {
     .border-y {
         @apply border-stone-400 dark:border-stone-700;
     }
+}
+
+/* temporary */
+input[type="text"], input[type="password"], button {
+    @apply border;
 }
 
 .form-error {

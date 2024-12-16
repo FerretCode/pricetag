@@ -5,8 +5,20 @@
     <h1>
         Manage Users
     </h1>
-    <div class="flex flex-wrap gap-8 flex-row-reverse justify-end">
-        <nav class="flex-grow min-w-52">
+    <table>
+        <tbody>
+            <tr>
+                <th>Username</th>
+                <td>{{.Data.Username}}</td>
+            </tr>
+            <tr>
+                <th>Permissions</th>
+                <td>{{join .Data.UserPerms}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="flex flex-wrap sm:flex-nowrap gap-8 flex-col sm:flex-row justify-between">
+        <nav class="w-full sm:max-w-64">
             <form method="GET" id="select-user-form">
                 <div class="flex flex-col border">
                     <label class="p-2 mb-0 border-b text-lg text-stone-500" for="select-user">
@@ -15,16 +27,16 @@
                     <select
                         name="username"
                         id="select-user"
-                        size="5"
+                        size="6"
                     >
                     {{range .Data.Usernames}}
                         <option
                             value="{{.}}"
                             {{if eq . $.Data.Username}}
-                            class="my-1 px-2 hover:cursor-pointer font-bold bg-blue-200"
+                            class="px-2 py-4 sm:py-1 font-bold bg-blue-200"
                             selected
                             {{else}}
-                            class="my-1 px-2 hover:cursor-pointer hover:underline"
+                            class="px-2 py-4 sm:py-1 hover:cursor-pointer hover:bg-stone-100 hover:underline"
                             {{end}}
                         >{{.}}</option>
                     {{end}}
@@ -35,7 +47,7 @@
                 </div>
             </form>
         </nav>
-        <section class="w-2/3">
+        <section>
             <h2>
                 Permissions
             </h2>
@@ -45,9 +57,9 @@
                 {{if includes $.Data.UserPerms "admin"}}
                 <input type="hidden" name="admin" value="on">
                 {{end}}
-                <div class="flex flex-wrap gap-2 py-4">
+                <div class="flex flex-wrap gap-4 sm:gap-2 py-4">
                     {{range .Data.Permissions}}
-                    <div>
+                    <div class="flex">
                         <input
                             class="peer appearance-none"
                             type="checkbox"
@@ -61,7 +73,7 @@
                             {{end}}
                         >
                         <label
-                            class="px-4 py-2 rounded-full border-2 border-stone-100 bg-stone-100 hover:cursor-pointer peer-checked:bg-blue-100 peer-checked:border-blue-400"
+                            class="w-32 py-2 text-center rounded-full border-2 border-stone-100 bg-stone-100 hover:cursor-pointer peer-checked:bg-blue-100 peer-checked:border-blue-400 peer-disabled:cursor-not-allowed"
                             for="perm-{{.}}"
                         >{{.}}</label>
                     </div>
@@ -72,13 +84,13 @@
                 </noscript>
             </form>
             {{if .Data.ShowDelete}}
-            <h2 class="mt-8">
+            <h2 class="mt-8 mb-4">
                 Danger Zone
             </h2>
             <form method="POST" action="/users/delete" id="delete-user-form">
                 <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 <input type="hidden" name="username" value="{{.Data.Username}}">
-                <button class="underline text-red-500 hover:cursor-pointer">
+                <button>
                     Delete User
                 </button>
             </form>

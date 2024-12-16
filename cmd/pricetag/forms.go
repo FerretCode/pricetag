@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -10,10 +11,12 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const formErrorsSessionKey = "form-errors"
-
+// HTML form validation errors. Keys are form input names
+// and values are validation error messages.
 type FormErrors map[string]string
 
+// Implements error interface. This returns each key/value pair
+// as its own line
 func (formErrors FormErrors) Error() string {
 	buff := bytes.NewBufferString("")
 
@@ -24,6 +27,8 @@ func (formErrors FormErrors) Error() string {
 
 	return strings.TrimSpace(buff.String())
 }
+
+const formErrorsSessionKey = "form-errors"
 
 // Push form errors to session data
 func (app *application) putFormErrors(r *http.Request, formErrors FormErrors) {
@@ -80,14 +85,20 @@ func (app *application) parseForm(r *http.Request, dst any) error {
 				case "max":
 					msg = "maximum length: " + param
 				case "eqfield":
+					// Field input value not equal to input[name="password"]
 					if param == "Password" {
 						msg = "passwords must be the same"
 					}
 				default:
-					msg = tag
-					if param != "" {
-						msg += ": " + param
-					}
+					// This should be unexpected (akin to internal server error).
+					// Return a generic error message and log the FieldError Tag
+					// so that we can implement an error message.
+					app.logger.Error(
+						"unexpected form validation error",
+						slog.String("tag", tag),
+						slog.String("param", param))
+
+					msg = ""
 				}
 
 				name := fieldErr.StructField()

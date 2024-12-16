@@ -113,12 +113,11 @@ func (app *application) handleUsersDeletePost(w http.ResponseWriter, r *http.Req
 
 	user, err := app.models.User.GetWithUsername(form.Username)
 	if err != nil {
-		switch {
-		case errors.Is(err, models.ErrNoRecord):
+		if errors.Is(err, models.ErrNoRecord) {
 			return app.renderError(w, r, http.StatusBadRequest, "user does not exist")
-		default:
-			return err
 		}
+
+		return err
 	}
 
 	perms, err := app.models.Permission.GetForUser(user.ID)
@@ -126,12 +125,14 @@ func (app *application) handleUsersDeletePost(w http.ResponseWriter, r *http.Req
 		return err
 	}
 
+	// Can not delete other admins
 	if perms.Include("admin") {
 		suid, err := app.getSessionUserID(r)
 		if err != nil {
 			return err
 		}
 
+		// Can delete self
 		if user.ID != suid {
 			return app.renderError(w, r, http.StatusForbidden, "can not delete admin user")
 		}

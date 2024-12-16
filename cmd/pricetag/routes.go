@@ -10,32 +10,6 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type withError func(w http.ResponseWriter, r *http.Request) error
-
-// http.HandlerFunc wrapper with error handling
-func (app *application) handle(h withError) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if err := h(w, r); err != nil {
-			var formErrors FormErrors
-			switch {
-			case errors.As(err, &formErrors):
-				// Redirect to referer with form errors as session data
-				app.putFormErrors(r, formErrors)
-				http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
-			default:
-				// Log unexpected error and return internal server error
-				app.logger.Error("handled unexpected error", slog.Any("err", err), slog.String("type", fmt.Sprintf("%T", err)))
-
-				http.Error(w,
-					http.StatusText(http.StatusInternalServerError),
-					http.StatusInternalServerError,
-				)
-				app.renderError(w, r, http.StatusInternalServerError, "something went wrong...")
-			}
-		}
-	}
-}
-
 // App router
 func (app *application) routes() http.Handler {
 	r := chi.NewRouter()
@@ -108,4 +82,30 @@ func (app *application) handleFavicon(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) handleNotFound(w http.ResponseWriter, r *http.Request) error {
 	return app.renderError(w, r, http.StatusNotFound, MessageNotFound)
+}
+
+type withError func(w http.ResponseWriter, r *http.Request) error
+
+// http.HandlerFunc wrapper with error handling
+func (app *application) handle(h withError) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := h(w, r); err != nil {
+			// First, check for any expected errors
+			var formErrors FormErrors
+			if errors.As(err, &formErrors) {
+				// Redirect to previous page with form errors in session data
+				app.putFormErrors(r, formErrors)
+				http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
+			}
+
+			// Log unexpected error and return internal server error
+			app.logger.Error("handled unexpected error", slog.Any("err", err), slog.String("type", fmt.Sprintf("%T", err)))
+
+			http.Error(w,
+				http.StatusText(http.StatusInternalServerError),
+				http.StatusInternalServerError,
+			)
+			app.renderError(w, r, http.StatusInternalServerError, "something went wrong...")
+		}
+	}
 }

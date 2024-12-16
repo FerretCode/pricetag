@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ferretcode/pricetag/ui"
@@ -65,7 +66,7 @@ func (app *application) renderError(w http.ResponseWriter, r *http.Request, stat
 	}
 
 	data.Status = fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode))
-	data.Message = userMessage.Capitalize()
+	data.Message = string(userMessage)
 
 	app.render(w, r, statusCode, "error.tmpl", data)
 
@@ -108,8 +109,13 @@ func includes(slice []string, value string) bool {
 	return false
 }
 
+func join(s []string) string {
+	return strings.Join(s, ", ")
+}
+
 var functions = template.FuncMap{
 	"includes": includes,
+	"join":     join,
 }
 
 // Create new template cache with ui.Files embedded file system.
