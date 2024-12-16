@@ -79,6 +79,10 @@ func (app *application) parseForm(r *http.Request, dst any) error {
 					msg = "minimum length: " + param
 				case "max":
 					msg = "maximum length: " + param
+				case "eqfield":
+					if param == "Password" {
+						msg = "passwords must be the same"
+					}
 				default:
 					msg = tag
 					if param != "" {

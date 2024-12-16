@@ -56,7 +56,11 @@ func (app *application) routes() http.Handler {
 			r.Post("/login", app.handle(app.handleAuthLoginPost))
 			r.Post("/logout", app.handle(app.handleAuthLogoutPost))
 			r.Post("/signup", app.handle(app.handleAuthSignupPost))
-			// TODO: "/change-password"
+			r.Route("/change-password", func(r chi.Router) {
+				r.Use(app.requireAuthentication)
+				r.Get("/", app.handle(app.handleAuthChangePasswordGet))
+				r.Post("/", app.handle(app.handleAuthChangePasswordPost))
+			})
 		})
 
 		r.Route("/", func(r chi.Router) {

@@ -162,3 +162,57 @@ func (app *application) handleAuthSignupPost(w http.ResponseWriter, r *http.Requ
 
 	return nil
 }
+
+func (app *application) handleAuthChangePasswordGet(w http.ResponseWriter, r *http.Request) error {
+	return app.render(w, r, http.StatusOK, "change-password.tmpl", nil)
+}
+
+func (app *application) handleAuthChangePasswordPost(w http.ResponseWriter, r *http.Request) error {
+	var form struct {
+		Password string `form:"password" validate:"required,min=8,max=72"`
+		Confirm  string `form:"confirm" validate:"required,eqfield=Password"`
+	}
+
+	err := app.parseForm(r, &form)
+	if err != nil {
+		return err
+	}
+
+	suid, err := app.getSessionUserID(r)
+	if err != nil {
+		return err
+	}
+
+	user, err := app.models.User.GetWithID(suid)
+	if err != nil {
+		return err
+	}
+
+	// Change password
+	err = user.SetPasswordHash(form.Password)
+	if err != nil {
+		return err
+	}
+
+	err = app.models.User.Update(user)
+	if err != nil {
+		return err
+	}
+
+	// Logout user
+	app.sessionManager.Clear(r.Context())
+	err = app.logout(r)
+	if err != nil {
+		return err
+	}
+
+	f := FlashMessage{
+		Type:    FlashSuccess,
+		Message: "Successfully changed password. Please login.",
+	}
+	app.putFlash(r, f)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	return nil
+}
