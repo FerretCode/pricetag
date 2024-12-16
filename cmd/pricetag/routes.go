@@ -30,6 +30,7 @@ func (app *application) handle(h withError) http.HandlerFunc {
 					http.StatusText(http.StatusInternalServerError),
 					http.StatusInternalServerError,
 				)
+				app.renderError(w, r, http.StatusInternalServerError, "something went wrong...")
 			}
 		}
 	}
@@ -55,6 +56,7 @@ func (app *application) routes() http.Handler {
 			r.Post("/login", app.handle(app.handleAuthLoginPost))
 			r.Post("/logout", app.handle(app.handleAuthLogoutPost))
 			r.Post("/signup", app.handle(app.handleAuthSignupPost))
+			// TODO: "/change-password"
 		})
 
 		r.Route("/", func(r chi.Router) {

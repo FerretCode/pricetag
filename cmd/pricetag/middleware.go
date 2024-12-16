@@ -17,7 +17,7 @@ func (app *application) recovery(next http.Handler) http.Handler {
 
 				app.logger.Error("recovered from panic", slog.Any("err", err))
 
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				app.renderError(w, r, http.StatusInternalServerError, "something went wrong...")
 			}
 		}()
 
@@ -58,7 +58,8 @@ func (app *application) csrfFailureHandler() http.Handler {
 			slog.String("uri", r.URL.RequestURI()),
 		)
 
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		// Send generic error response to user
+		app.renderError(w, r, http.StatusBadRequest, "")
 	})
 }
 
@@ -77,7 +78,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 		// Check if user with ID exists in database
 		exists, err := app.models.User.Exists(id)
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			app.renderError(w, r, http.StatusInternalServerError, "")
 			app.logger.Error("middleware authenticate", slog.Any("err", err))
 
 			return
@@ -113,7 +114,7 @@ func (app *application) requirePermission(code string) func(http.Handler) http.H
 		fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			suid, err := app.getSessionUserID(r)
 			if err != nil {
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				app.renderError(w, r, http.StatusInternalServerError, "")
 				app.logger.Error("middleware requirePermission", slog.Any("err", err))
 
 				return
@@ -121,14 +122,15 @@ func (app *application) requirePermission(code string) func(http.Handler) http.H
 
 			permissions, err := app.models.Permission.GetForUser(suid)
 			if err != nil {
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				app.renderError(w, r, http.StatusInternalServerError, "")
 				app.logger.Error("middleware requirePermission", slog.Any("err", err))
 
 				return
 			}
 
 			if !permissions.Include(code) {
-				app.renderError(w, r, http.StatusForbidden, fmt.Sprintf("permission required: %s", code))
+				msg := fmt.Sprintf("permission required: %s", code)
+				app.renderError(w, r, http.StatusForbidden, Message(msg))
 
 				return
 			}
