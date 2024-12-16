@@ -1,5 +1,19 @@
-/*
-@tailwind base;
+/*@tailwind base;*/
 @tailwind components;
 @tailwind utilities;
-*/
+
+.form-error {
+    @apply text-red-500;
+}
+
+.flash-info {
+    @apply border-blue-600 text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-100;
+}
+
+.flash-success {
+    @apply border-green-600 text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-100;
+}
+
+.flash-error {
+    @apply border-red-600 text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-100;
+}
