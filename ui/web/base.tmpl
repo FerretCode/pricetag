@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="/static/main.css">
     <title>{{template "title" .}}</title>
 </head>
-<body>
+<body class="max-w-screen-md mx-auto">
     {{if .IsAuthenticated}}
-    <nav>
-        <a href="/">Dashboard</a>
+    <nav class="flex justify-between mb-8">
+        <a href="/">pricetag</a>
         <form action="/auth/logout" method="POST">
             <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
             <button>

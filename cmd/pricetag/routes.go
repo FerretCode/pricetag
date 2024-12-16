@@ -78,6 +78,8 @@ func (app *application) routes() http.Handler {
 		})
 	})
 
+	r.NotFound(app.handle(app.handleNotFound))
+
 	return r
 }
 
@@ -102,4 +104,8 @@ func (app *application) handleFavicon(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeFileFS(w, r, ui.Files, "static/favicon.ico")
+}
+
+func (app *application) handleNotFound(w http.ResponseWriter, r *http.Request) error {
+	return app.renderError(w, r, http.StatusNotFound, MessageNotFound)
 }

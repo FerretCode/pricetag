@@ -15,17 +15,29 @@
             </tr>
         </tbody>
     </table>
-    <p>
+    <p class="pt-4">
         <a href="/auth/change-password">Change password</a>
     </p>
-    <nav>
-        <ul>
-            <li><a href="/services">Tracked services</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/forwarding">Forwarding</a></li>
-            <li><a href="/logs">Logs</a></li>
-            <li><a href="/users">Users</a></li>
-        </ul>
+    <nav class="flex flex-col gap-6 my-8">
+        <div class="flex justify-center gap-6">
+            <a class="w-64 p-4 text-center border rounded bg-blue-200 border-blue-400 hover:bg-blue-100 hover:border-blue-300" href="/services">
+                Tracked services
+            </a>
+            <a class="w-64 p-4 text-center border rounded bg-blue-200 border-blue-400 hover:bg-blue-100 hover:border-blue-300" href="/tags">
+                Tags
+            </a>
+            <a class="w-64 p-4 text-center border rounded bg-blue-200 border-blue-400 hover:bg-blue-100 hover:border-blue-300" href="/forwarding">
+                Forwarding
+            </a>
+        </div>
+        <div class="flex justify-center gap-6">
+            <a class="w-64 p-4 text-center border rounded bg-blue-200 border-blue-400 hover:bg-blue-100 hover:border-blue-300" href="/logs">
+                Logs
+            </a>
+            <a class="w-64 p-4 text-center border rounded bg-blue-200 border-blue-400 hover:bg-blue-100 hover:border-blue-300" href="/users">
+                Users
+            </a>
+        </div>
     </nav>
 </main>
 {{end}}
