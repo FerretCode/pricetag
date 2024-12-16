@@ -81,7 +81,7 @@ func (app *application) handleAuthLoginPost(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		switch {
 		case errors.Is(err, models.ErrInvalidCredentials):
-			return app.renderError(w, r, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+			return app.renderError(w, r, http.StatusUnauthorized, "invalid credentials")
 		default:
 			return err
 		}
@@ -132,7 +132,7 @@ func (app *application) handleAuthSignupPost(w http.ResponseWriter, r *http.Requ
 	user, err := app.models.User.New(form.Username, form.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateUsername) {
-			return app.renderError(w, r, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+			return app.renderError(w, r, http.StatusUnauthorized, "invalid credentials")
 		}
 
 		return err

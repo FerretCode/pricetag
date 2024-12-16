@@ -1,0 +1,14 @@
+{{define "title"}}{{.Data.Status}}{{end}}
+
+{{define "main"}}
+<main>
+    <h1>{{.Data.Status}}</h1>
+    {{with .Data.Message}}
+    <p>
+        {{.}}
+    </p>
+    {{end}}
+</main>
+{{end}}
+
+{{define "scripts"}}{{end}}

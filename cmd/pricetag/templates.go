@@ -59,7 +59,17 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, statusCod
 
 // Render error template with statusCode. Default userMessage with http.StatusText
 func (app *application) renderError(w http.ResponseWriter, r *http.Request, statusCode int, userMessage string) error {
-	http.Error(w, userMessage, statusCode)
+	var data struct {
+		Status  string
+		Message string
+	}
+
+	data.Status = fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode))
+	if userMessage != http.StatusText(statusCode) {
+		data.Message = userMessage
+	}
+
+	app.render(w, r, statusCode, "error.tmpl", data)
 
 	return nil
 }
